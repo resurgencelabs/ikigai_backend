@@ -48,7 +48,7 @@ async function main() {
     // We create PXE client connected to the sandbox URL
     const pxe = createPXEClient(PXE_URL);
 
-    logger(`Waiting for sandbox to be ready...`)
+    logger(`Waiting PXE to be ready on ${PXE_URL}...`)
     await waitForSandbox(pxe);
 
     const nodeInfo = await pxe.getNodeInfo();

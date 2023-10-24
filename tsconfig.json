@@ -17,6 +17,8 @@
     "importHelpers": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
   },
   "include": ["src", "src/**/*.json"],
   "references": []
