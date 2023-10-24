@@ -17,8 +17,7 @@
       "resolveJsonModule": true,
       "composite": true,
       "skipLibCheck": true,
-      "allowImportingTsExtensions": true,
-      "emitDeclarationOnly": true,
+      
     },
     "references": [],
     "include": ["core/src", "core/src/*.json", "core/src/target", "core/src/target/*.json", "core/ts", "core/target", "core/target/*.json"]

@@ -9,9 +9,10 @@ import {
     getSchnorrAccount,
     waitForSandbox,
     AztecAddress,
+    computeAuthWitMessageHash,
   } from '@aztec/aztec.js';
   
-  import { SubscriptionContract } from "../ts/Subscription.ts";
+  import { SubscriptionContract } from "../ts/Subscription.js";
   
   import { format } from 'util';
   
@@ -60,13 +61,21 @@ import {
       const proj = 1;
       const exp = 20;
       const cd = 123;
-      const token_contract = AztecAddress.fromString('0x2d8bca44025c49286d9f977a05a57da76b21ef1519554a8421dd4e4ac13d9fca');
+      const token_contract = AztecAddress.fromString('0x1ac294e9c79e98bb461a0f5a3aa324e15eb793701579fb7867f78277fb7600dd');
       const beneficiary = bob;
       const amount = 500;
-  
+      
+      
       logger(`Subscribing to a project for Alice...`);
+      let action = contract.withWallet(accounts[0]).methods.subscribe_and_mint(proj, exp, cd, token_contract, beneficiary, amount);
+      const messageHash = await computeAuthWitMessageHash(alice, action.request());
+      const witness = await accounts[0].createAuthWitness(messageHash);
+      await accounts[1].addAuthWitness(witness);
+      const tx = action.send();
+      const receipt2 = await tx.wait();
+      logger(receipt2.status);
       // Mint the initial supply privately "to secret hash"
-      const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token_contract, beneficiary, amount).send().wait();
+      //const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token_contract, beneficiary, amount).send().wait();
   
       
       logger(`Private Subscription NFT successfully minted and redeemed by Alice`);

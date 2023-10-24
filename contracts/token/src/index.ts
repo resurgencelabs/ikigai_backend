@@ -47,7 +47,7 @@ async function main() {
     // Deploy the contract and set Alice as the admin while doing so
     const contract = await TokenContract.deploy(pxe, alice).send().deployed();
     logger(`Contract successfully deployed at address ${contract.address.toString()}`);
-
+    
     // Create the contract abstraction and link it to Alice's wallet for future signing
     const tokenContractAlice = await TokenContract.at(contract.address, accounts[0]);
 

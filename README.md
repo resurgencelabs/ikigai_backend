@@ -15,11 +15,13 @@ export PK= // the private key for Alice, usually 0x2153536ff6628eee01cf4024889ff
 aztec-cli call balance_of_private --args $ADDRESS --contract-artifact TokenContractArtifact --contract-address $CONTRACT  
 // should output 1000001  
 cd ../subscription   
-aztec-cli compile .  
-aztec-cli deploy target/Subscription.json   
-// look for the address where the resulting log says the contract is deployed   
-export CONTRACT2= // the address in the previous step  
-aztec-cli send subscribe_and_mint --args 0x01 0x30 0x155 $CONTRACT  0x115f123bbc6cc6af9890055821cfba23a7c4e8832377a32ccb719a1ba3a86483 0x400 --contract-artifact target/Subscription.json --contract-address $CONTRACT2 --private-key $PK
+aztec-cli compile .  --typescript ./ts   
+cd core/src  
+// in the index.ts file, edit the contract address for token as obtained above    
+cd ../..  
+yarn build  
+yarn start   
+
 
 
 
