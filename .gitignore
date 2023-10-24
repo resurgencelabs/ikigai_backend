@@ -1,5 +1,6 @@
 node_modules
 dest
 build
+src/contracts/token/src/Token_interface.nr
 src/contracts/token/types/Token.ts
 target
