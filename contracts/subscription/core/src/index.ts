@@ -61,16 +61,16 @@ import {
       const proj = 1;
       const exp = 20;
       const cd = 123;
-      const token_contract = AztecAddress.fromString('0x1ac294e9c79e98bb461a0f5a3aa324e15eb793701579fb7867f78277fb7600dd');
+      const token_contract = AztecAddress.fromString('0x20bf8fc5f4c3851aa69a2583072be8a97717b8479abd95bf72deb649ba1236f8');
       const beneficiary = bob;
       const amount = 500;
       
       
-      logger(`Subscribing to a project for Alice...`);
+      logger(`Subscribing Alice to a project...`);
       let action = contract.withWallet(accounts[0]).methods.subscribe_and_mint(proj, exp, cd, token_contract, beneficiary, amount);
       const messageHash = await computeAuthWitMessageHash(alice, action.request());
-      const witness = await accounts[0].createAuthWitness(messageHash);
-      await accounts[1].addAuthWitness(witness);
+      const witness = await accounts[1].createAuthWitness(messageHash);
+      await accounts[0].addAuthWitness(witness);
       const tx = action.send();
       const receipt2 = await tx.wait();
       logger(receipt2.status);
