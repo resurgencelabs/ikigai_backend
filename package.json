@@ -11,7 +11,7 @@
       "build:dev": "tsc -b --watch",
       "clean": "rm -rf ./dest tsconfig.tsbuildinfo",
       "start": "yarn build && DEBUG='subscription' node ./dest/index.js",
-      "compile:contracts": "aztec-cli compile ./src/contracts/token --typescript types && yarn generate:token:interface && aztec-cli compile ./src/contracts/subscription --typescript types",
+      "compile:contracts": "aztec-cli compile ./src/contracts/token --typescript types && aztec-cli compile ./src/contracts/subscription --typescript types",
       "generate:token:interface": "aztec-cli generate-noir-interface ./src/contracts/token --artifacts target --outdir ../subscription/src"
     },
     "dependencies": {

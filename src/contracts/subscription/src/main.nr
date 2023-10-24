@@ -1,4 +1,5 @@
 mod asset_note;
+mod Token_interface;
 
 contract Subscription {
     use dep::std::option::Option;
@@ -33,9 +34,9 @@ contract Subscription {
             compute_authwit_message_hash, 
         },
     };
-    use dep::token_interface::{TokenPrivateContextInterface, FromTransferStruct, ToTransferStruct};
- 
+
     use crate::asset_note::{AssetNote, AssetNoteMethods, ASSET_NOTE_LEN};
+    use crate::Token_interface::{TokenPrivateContextInterface, FromTransferStruct, ToTransferStruct};
 
     struct Storage {
         // the attributes of the strictly private NFT
@@ -105,18 +106,7 @@ contract Subscription {
         let mut owner_note = AssetNote::new(owner, proj, tr, exp, cd);
 
         let owner_set = storage.nft_data.at(owner);
-        owner_set.insert(&mut owner_note);
-    
-        
-        // Emit the newly created encrypted note preimages via oracle calls.
-        let owner_key = get_public_key(owner);
-        emit_encrypted_log(
-            &mut context,
-            context.this_address(),
-            owner_set.storage_slot,
-            owner_key,
-            owner_note.serialize(),
-        );
+        owner_set.insert(&mut owner_note, true);
     }
 
     // No transfer method because this is an instance of a Soul Bound Private NFT

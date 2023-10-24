@@ -3,4 +3,5 @@ dest
 build
 src/contracts/token/src/Token_interface.nr
 src/contracts/token/types/Token.ts
+src/contracts/subscription/types/Subscription.ts
 target
