@@ -1,20 +1,18 @@
 import {
+    AztecAddress,
     Fr,
+    NotePreimage,
     PXE,
-    Contract,
+    Wallet,
     computeMessageSecretHash,
     createPXEClient,
     getSandboxAccountsWallets,
-    getSchnorrAccount,
-    waitForSandbox,
-    AztecAddress,
-    Wallet,
-    NotePreimage,
+    waitForSandbox
 } from '@aztec/aztec.js';
 
+import { TokenContract } from '@aztec/noir-contracts/types';
 import { format } from 'util';
 import { SubscriptionContract } from './contracts/subscription/types/Subscription.js';
-import { TokenContract } from '@aztec/noir-contracts/types';
 
 const { PXE_URL = 'http://localhost:8080' } = process.env;
 

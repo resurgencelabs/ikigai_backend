@@ -7,20 +7,20 @@
     "type": "module",
     "private": true,
     "scripts": {
-      "build": "export NODE_OPTIONS=--max-old-space-size=8192 && yarn clean && tsc -b",
+      "build": "export NODE_OPTIONS=--max-old-space-size=8192 && tsc -b",
       "build:dev": "export NODE_OPTIONS=--max-old-space-size=8192 && tsc -b --watch",
       "install:noir": "curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash noirup -v NOIR_VERSION",
       "install:sandbox": "docker pull aztecprotocol/aztec-sandbox:latest",
-      "clean": "rm -rf ./dest tsconfig.tsbuildinfo",
+      "clean": "rm -rf ./dest",
       "start:sandbox": "SANDBOX_VERSION=latest /bin/bash -c \"$(curl -fsSL 'https://sandbox.aztec.network')\" ",
       "start": "export NODE_OPTIONS=--max-old-space-size=8192 && yarn build && DEBUG='subscription' node ./dest/index.js",
       "compile:contracts": "aztec-cli compile ./src/contracts/token --typescript types && aztec-cli compile ./src/contracts/subscription --typescript types",
       "generate:token:interface": "aztec-cli generate-noir-interface ./src/contracts/token --artifacts target --outdir ../subscription/src"
     },
     "dependencies": {
-      "@aztec/aztec.js": "^0.9.0",
-      "@aztec/noir-contracts": "^0.9.0",
-      "@types/node": "^20.8.7",
+      "@aztec/aztec.js": "^0.10.1",
+      "@aztec/noir-contracts": "^0.10.1",
+      "@types/node": "^20.8.8",
       "typescript": "^5.2.2"
     }
   }
