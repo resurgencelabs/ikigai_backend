@@ -5,6 +5,7 @@ import {
     PXE,
     Wallet,
     computeMessageSecretHash,
+    createDebugLogger,
     createPXEClient,
     getSandboxAccountsWallets,
     waitForSandbox
@@ -16,15 +17,17 @@ import { SubscriptionContract } from './contracts/subscription/types/Subscriptio
 
 const { PXE_URL = 'http://localhost:8080' } = process.env;
 
+const logger = createDebugLogger('subscription:');
+
 const deployTokenContract = async (wallet: Wallet, initialAdminBalance: bigint, admin: AztecAddress) => {
-    console.log(`Deploying Token contract...`);
+    logger(`Deploying Token contract...`);
     const contract = await TokenContract.deploy(wallet, admin).send().deployed();
 
     if (initialAdminBalance > 0n) {
         await mintTokens(contract, admin, initialAdminBalance, wallet);
     }
 
-    console.log('L2 contract deployed');
+    logger('L2 contract deployed');
 
     return contract.completeAddress;
 };
@@ -44,12 +47,13 @@ async function main() {
     ////////////// CREATE THE CLIENT INTERFACE AND CONTACT THE SANDBOX //////////////
     // We create PXE client connected to the sandbox URL
     const pxe = createPXEClient(PXE_URL);
-    // Wait for sandbox to be ready
+
+    logger(`Waiting for sandbox to be ready...`)
     await waitForSandbox(pxe);
 
     const nodeInfo = await pxe.getNodeInfo();
 
-    console.log(format('Aztec Sandbox Info ', nodeInfo));
+    logger(format('Aztec Sandbox Info ', nodeInfo));
 
 
     ////////////// LOAD SOME ACCOUNTS FROM THE SANDBOX //////////////
@@ -59,8 +63,8 @@ async function main() {
     const bobWallet = accounts[1];
     const alice = aliceWallet.getAddress();
     const bob = bobWallet.getAddress();
-    console.log(`Loaded alice's account at ${alice.toString()}`);
-    console.log(`Loaded bob's account at ${bob.toString()}`);
+    logger(`Loaded alice's account at ${alice.toString()}`);
+    logger(`Loaded bob's account at ${bob.toString()}`);
 
 
     ////////////// DEPLOY OUR TOKEN CONTRACT //////////////
@@ -70,12 +74,12 @@ async function main() {
     ////////////// DEPLOY OUR SUBSCRIPTION CONTRACT //////////////
 
 
-    console.log(`Deploying subscription contract...`);
+    logger(`Deploying subscription contract...`);
 
     // Deploy the contract and set Alice as the admin while doing so
 
     const contract = await SubscriptionContract.deploy(pxe).send().deployed();
-    console.log(`Contract successfully deployed at address ${contract.address.toString()}`);
+    logger(`Contract successfully deployed at address ${contract.address.toString()}`);
 
     // Create the contract abstraction and link it to Alice's wallet for future signing
     const subsContractAlice = await SubscriptionContract.at(contract.address, accounts[0]);
@@ -91,12 +95,12 @@ async function main() {
     const beneficiary = bob;
     const amount = 500;
 
-    console.log(`Subscribing to a project for Alice...`);
+    logger(`Subscribing to a project for Alice...`);
     // Mint the initial supply privately "to secret hash"
     const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token_contract, beneficiary, amount).send().wait();
 
 
-    console.log(`Private Subscription NFT successfully minted and redeemed by Alice`);
+    logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
 }
 
 main();
