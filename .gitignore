@@ -1,3 +1,5 @@
-contracts/token/node_modules
-contracts/token/dest
-contracts/subscription/node_modules
+node_modules
+dest
+build
+src/contracts/token/types/Token.ts
+target
