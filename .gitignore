@@ -8,4 +8,4 @@ src/contracts/subscription/types/Subscription.ts
 target
 log
 .tsbuildinfo
-
+src/contracts/token/crs
