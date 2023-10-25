@@ -73,7 +73,7 @@ async function main() {
     const mintAmount = 1000000n;
     const token = await deployTokenContract(aliceWallet, mintAmount, alice, secret);
 
-    await token.methods.redeem_shield(alice, mintAmount, secret).send();
+    await token.methods.redeem_shield(alice, mintAmount, secret).send().wait();
     let aliceBalance = await token.methods.balance_of_private(alice).view();
     logger(`Alice's private balance: ${aliceBalance}`);
 
