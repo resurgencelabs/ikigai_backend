@@ -1,28 +1,27 @@
 {
-    "name": "subscription",
-    "version": "1.0.0",
-    "description": "Primary contract to test out the Subscription Contract",
-    "main": "index.js",
-    "license": "MIT",
-    "type": "module",
-    "private": true,
-    "scripts": {
-      "build": "tsc -b",
-      "build:dev": "tsc -b --watch",
-      "install:noir": "curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash noirup -v NOIR_VERSION",
-      "install:sandbox": "docker pull aztecprotocol/aztec-sandbox:latest",
-      "install:sandbox:npm": "npm install -g @aztec/aztec-sandbox",
-      "clean": "rm -rf ./dest ./.tsbuildinfo",
-      "start:sandbox": "SANDBOX_VERSION=latest /bin/bash -c \"$(curl -fsSL 'https://sandbox.aztec.network')\" ",
-      "start:sandbox:npm": "npx @aztec/aztec-sandbox",
-      "start": " yarn build && DEBUG='subscription*' node ./dest/index.js",
-      "compile:contracts": "aztec-cli compile ./src/contracts/token --typescript types && aztec-cli compile ./src/contracts/subscription --typescript types && rm src/contracts/token/target/debug_token_contract-Token.json",
-      "generate:token:interface": "aztec-cli generate-noir-interface ./src/contracts/token --artifacts target --outdir ../subscription/src"
-    },
-    "dependencies": {
-      "@aztec/aztec.js": "^0.11.1",
-      "@types/node": "^20.8.8",
-      "typescript": "^5.2.2"
-    }
+  "name": "subscription",
+  "version": "1.0.0",
+  "description": "Primary contract to test out the Subscription Contract",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc -b",
+    "build:dev": "tsc -b --watch",
+    "install:noir": "curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash noirup -v NOIR_VERSION",
+    "install:sandbox": "docker pull aztecprotocol/aztec-sandbox:latest",
+    "install:sandbox:npm": "npm install -g @aztec/aztec-sandbox",
+    "clean": "rm -rf ./dest ./.tsbuildinfo",
+    "start:sandbox": "SANDBOX_VERSION=latest /bin/bash -c \"$(curl -fsSL 'https://sandbox.aztec.network')\" ",
+    "start:sandbox:npm": "npx @aztec/aztec-sandbox",
+    "start": " yarn build && DEBUG='subscription*' node ./dest/index.js",
+    "compile:contracts": "aztec-cli compile ./src/contracts/token --typescript types && aztec-cli compile ./src/contracts/subscription --typescript types && rm src/contracts/token/target/debug_token_contract-Token.json",
+    "generate:token:interface": "aztec-cli generate-noir-interface ./src/contracts/token --artifacts target --outdir ../subscription/src"
+  },
+  "dependencies": {
+    "@aztec/aztec.js": "^0.11.1",
+    "@types/node": "^20.8.8",
+    "typescript": "^5.2.2"
   }
-  
+}

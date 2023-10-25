@@ -20,12 +20,12 @@ const { PXE_URL = 'http://localhost:8080' } = process.env;
 
 const logger = createDebugLogger('subscription:');
 
-const deployTokenContract = async (wallet: Wallet, initialAdminBalance: bigint, admin: AztecAddress) => {
+const deployTokenContract = async (wallet: Wallet, initialAdminBalance: bigint, admin: AztecAddress, secret: Fr) => {
     logger(`Deploying Token contract...`);
     const contract = await TokenContract.deploy(wallet, admin).send().deployed();
 
     if (initialAdminBalance > 0n) {
-        await mintTokens(contract, admin, initialAdminBalance, wallet);
+        await mintTokens(contract, admin, initialAdminBalance, secret, wallet);
     }
 
     logger('Token deployed at ' + contract.address.toString());
@@ -33,8 +33,8 @@ const deployTokenContract = async (wallet: Wallet, initialAdminBalance: bigint, 
     return contract;
 };
 
-const mintTokens = async (contract: TokenContract, recipient: AztecAddress, balance: bigint, pxe: PXE) => {
-    const secret = Fr.random();
+const mintTokens = async (contract: TokenContract, recipient: AztecAddress, balance: bigint, secret: Fr, pxe: PXE) => {
+    // const secret = Fr.random();
     const secretHash = await computeMessageSecretHash(secret);
 
     const receipt = await contract.methods.mint_private(balance, secretHash).send().wait();
@@ -69,7 +69,13 @@ async function main() {
 
 
     ////////////// DEPLOY OUR TOKEN CONTRACT //////////////
-    const token = await deployTokenContract(aliceWallet, 1000000n, alice);
+    const secret = new Fr(55);
+    const mintAmount = 1000000n;
+    const token = await deployTokenContract(aliceWallet, mintAmount, alice, secret);
+
+    await token.methods.redeem_shield(alice, mintAmount, secret).send();
+    let aliceBalance = await token.methods.balance_of_private(alice).view();
+    logger(`Alice's private balance: ${aliceBalance}`);
 
     ////////////// DEPLOY OUR SUBSCRIPTION CONTRACT //////////////
 
@@ -95,11 +101,12 @@ async function main() {
 
     logger(`Subscribing to a project for Alice...`);
     // Mint the initial supply privately "to secret hash"
-    let action = token.withWallet(accounts[0]).methods.transfer(alice, beneficiary, amount, 0);
-    const messageHash = await computeAuthWitMessageHash(token.address, action.request());
-    const witness = await accounts[1].createAuthWitness(messageHash);
+    const nonce = 100;
+    let action = token.withWallet(accounts[0]).methods.transfer(alice, beneficiary, amount, nonce);
+    const messageHash = await computeAuthWitMessageHash(contract.address, action.request());
+    const witness = await accounts[0].createAuthWitness(messageHash);
     await accounts[0].addAuthWitness(witness);
-    const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token.address, beneficiary, amount).send().wait();
+    const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token.address, beneficiary, amount, nonce).send().wait();
 
     logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
 }
