@@ -8,6 +8,7 @@ import {
     createDebugLogger,
     createPXEClient,
     getSandboxAccountsWallets,
+    computeAuthWitMessageHash,
     waitForSandbox
 } from '@aztec/aztec.js';
 
@@ -94,6 +95,10 @@ async function main() {
 
     logger(`Subscribing to a project for Alice...`);
     // Mint the initial supply privately "to secret hash"
+    let action = token.withWallet(accounts[0]).methods.transfer(alice, beneficiary, amount, 0);
+    const messageHash = await computeAuthWitMessageHash(token.address, action.request());
+    const witness = await accounts[1].createAuthWitness(messageHash);
+    await accounts[0].addAuthWitness(witness);
     const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token.address, beneficiary, amount).send().wait();
 
     logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
