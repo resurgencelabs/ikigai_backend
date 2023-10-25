@@ -45,7 +45,7 @@ async function main() {
     logger(`Deploying token contract...`);
 
     // Deploy the contract and set Alice as the admin while doing so
-    const contract = await TokenContract.deploy(pxe, alice).send().deployed();
+    const contract = await TokenContract.deploy(accounts[0], alice).send().deployed();
     logger(`Contract successfully deployed at address ${contract.address.toString()}`);
     
     // Create the contract abstraction and link it to Alice's wallet for future signing
@@ -68,6 +68,7 @@ async function main() {
     // to a "token note")
     await tokenContractAlice.methods.redeem_shield(alice, initialSupply, aliceSecret).send().wait();
     logger(`${initialSupply} tokens were successfully minted and redeemed by Alice`);
+    
 }
 
 main();

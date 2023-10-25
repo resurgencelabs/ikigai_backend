@@ -16,7 +16,6 @@ import {
   EthAddressLike,
   FieldLike,
   Fr,
-  PXE,
   Point,
   PublicKey,
   Wallet,
@@ -56,15 +55,15 @@ export class SubscriptionContract extends ContractBase {
   /**
    * Creates a tx to deploy a new instance of this contract.
    */
-  public static deploy(pxe: PXE, ) {
-    return new DeployMethod<SubscriptionContract>(Point.ZERO, pxe, SubscriptionContractArtifact, Array.from(arguments).slice(1));
+  public static deploy(wallet: Wallet, ) {
+    return new DeployMethod<SubscriptionContract>(Point.ZERO, wallet, SubscriptionContractArtifact, Array.from(arguments).slice(1));
   }
 
   /**
    * Creates a tx to deploy a new instance of this contract using the specified public key to derive the address.
    */
-  public static deployWithPublicKey(pxe: PXE, publicKey: PublicKey, ) {
-    return new DeployMethod<SubscriptionContract>(publicKey, pxe, SubscriptionContractArtifact, Array.from(arguments).slice(2));
+  public static deployWithPublicKey(publicKey: PublicKey, wallet: Wallet, ) {
+    return new DeployMethod<SubscriptionContract>(publicKey, wallet, SubscriptionContractArtifact, Array.from(arguments).slice(2));
   }
   
 

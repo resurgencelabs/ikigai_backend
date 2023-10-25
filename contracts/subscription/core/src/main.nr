@@ -107,7 +107,7 @@ contract Subscription {
         let mut owner_note = AssetNote::new(owner, proj, tr, exp, cd);
 
         let owner_set = storage.nft_data.at(owner);
-        owner_set.insert(&mut owner_note);
+        owner_set.insert(&mut owner_note, false);
     
         
         // Emit the newly created encrypted note preimages via oracle calls.

@@ -1,4 +1,4 @@
-import { AztecAddress, AztecAddressLike, ContractArtifact, ContractBase, ContractFunctionInteraction, ContractMethod, DeployMethod, FieldLike, PXE, PublicKey, Wallet } from '@aztec/aztec.js';
+import { AztecAddress, AztecAddressLike, ContractArtifact, ContractBase, ContractFunctionInteraction, ContractMethod, DeployMethod, FieldLike, PublicKey, Wallet } from '@aztec/aztec.js';
 export declare const SubscriptionContractArtifact: ContractArtifact;
 /**
  * Type-safe interface for contract Subscription;
@@ -15,11 +15,11 @@ export declare class SubscriptionContract extends ContractBase {
     /**
      * Creates a tx to deploy a new instance of this contract.
      */
-    static deploy(pxe: PXE): DeployMethod<SubscriptionContract>;
+    static deploy(wallet: Wallet): DeployMethod<SubscriptionContract>;
     /**
      * Creates a tx to deploy a new instance of this contract using the specified public key to derive the address.
      */
-    static deployWithPublicKey(pxe: PXE, publicKey: PublicKey): DeployMethod<SubscriptionContract>;
+    static deployWithPublicKey(publicKey: PublicKey, wallet: Wallet): DeployMethod<SubscriptionContract>;
     /**
      * Returns this contract's artifact.
      */

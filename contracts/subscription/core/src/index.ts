@@ -13,6 +13,7 @@ import {
   } from '@aztec/aztec.js';
   
   import { SubscriptionContract } from "../ts/Subscription.js";
+  import { TokenContract, TokenContractArtifact } from '@aztec/noir-contracts/types';
   
   import { format } from 'util';
   
@@ -48,7 +49,7 @@ import {
       
       // Deploy the contract and set Alice as the admin while doing so
     
-      const contract = await SubscriptionContract.deploy(pxe).send().deployed();
+      const contract = await SubscriptionContract.deploy(accounts[0]).send().deployed();
       logger(`Contract successfully deployed at address ${contract.address.toString()}`);
   
       // Create the contract abstraction and link it to Alice's wallet for future signing
@@ -61,21 +62,20 @@ import {
       const proj = 1;
       const exp = 20;
       const cd = 123;
-      const token_contract = AztecAddress.fromString('0x20bf8fc5f4c3851aa69a2583072be8a97717b8479abd95bf72deb649ba1236f8');
+      const token_contract_add = AztecAddress.fromString('0x25501663ecc80072e20d0d6f291fea05e995c299a837f6e8f434177ebb2c36f6');
       const beneficiary = bob;
       const amount = 500;
       
       
       logger(`Subscribing Alice to a project...`);
-      let action = contract.withWallet(accounts[0]).methods.subscribe_and_mint(proj, exp, cd, token_contract, beneficiary, amount);
-      const messageHash = await computeAuthWitMessageHash(alice, action.request());
+      //const contract_token = await TokenContract.at(token_contract_add, accounts[0]);
+      const contract_token = await Contract.at(token_contract_add, TokenContractArtifact, accounts[0]);
+      let action = contract_token.withWallet(accounts[0]).methods.transfer(alice, beneficiary, amount, 0);
+      const messageHash = await computeAuthWitMessageHash(contract_token.address, action.request());
       const witness = await accounts[1].createAuthWitness(messageHash);
       await accounts[0].addAuthWitness(witness);
-      const tx = action.send();
-      const receipt2 = await tx.wait();
-      logger(receipt2.status);
-      // Mint the initial supply privately "to secret hash"
-      //const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token_contract, beneficiary, amount).send().wait();
+      
+      const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token_contract_add, beneficiary, amount).send().wait();
   
       
       logger(`Private Subscription NFT successfully minted and redeemed by Alice`);

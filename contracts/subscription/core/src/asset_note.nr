@@ -1,7 +1,19 @@
-use dep::aztec::note::note_interface::NoteInterface;
-use dep::aztec::note::note_header::NoteHeader;
-use dep::aztec::note::utils::compute_siloed_note_hash;
-use dep::aztec::oracle::get_secret_key::get_secret_key;
+use dep::aztec::log::emit_encrypted_log;
+
+use dep::aztec::{
+    note::{
+        note_header::NoteHeader,
+        note_interface::NoteInterface,
+        utils::compute_note_hash_for_read_or_nullify,
+    },
+    oracle::{
+        rand::rand,
+        get_secret_key::get_secret_key,
+        get_public_key::get_public_key,
+    },
+    hash::pedersen_hash,
+    context::PrivateContext,
+};
 
 global ASSET_NOTE_LEN: Field = 5;
 
@@ -32,18 +44,33 @@ impl AssetNote {
     }
 
     pub fn compute_nullifier(self) -> Field {
-        let siloed_note_hash = compute_siloed_note_hash(AssetNoteMethods, self);
+        let note_hash_for_nullify = compute_note_hash_for_read_or_nullify(AssetNoteMethods, self);
         let secret = get_secret_key(self.owner);
         // TODO(#1205) Should use a non-zero generator index.
-        dep::std::hash::pedersen([
-            siloed_note_hash,
+        pedersen_hash([
+            note_hash_for_nullify,
             secret.low,
             secret.high,
-        ])[0]
+        ],0)
     }
+
 
     pub fn set_header(&mut self, header: NoteHeader) {
         self.header = header;
+    }
+
+    // Broadcasts the note as an encrypted log on L1.
+    pub fn broadcast(self, context: &mut PrivateContext, slot: Field) {
+        let encryption_pub_key = get_public_key(self.owner);
+        // docs:start:encrypted
+        emit_encrypted_log(
+            context,
+            (*context).this_address(),
+            slot,
+            encryption_pub_key,
+            self.serialize(),
+        );
+        // docs:end:encrypted
     }
 }
 
@@ -79,6 +106,11 @@ fn set_header(note: &mut AssetNote, header: NoteHeader) {
     note.set_header(header);
 }
 
+// Broadcasts the note as an encrypted log on L1.
+fn broadcast(context: &mut PrivateContext, slot: Field, note: AssetNote) {
+    note.broadcast(context, slot);
+}
+
 global AssetNoteMethods = NoteInterface {
     deserialize,
     serialize,
@@ -86,4 +118,5 @@ global AssetNoteMethods = NoteInterface {
     compute_nullifier,
     get_header,
     set_header,
+    broadcast,
 };
