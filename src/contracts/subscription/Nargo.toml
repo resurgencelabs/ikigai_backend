@@ -1,0 +1,10 @@
+[package]
+name = "subscription"
+type = "contract"
+authors = [""]
+compiler_version = "0.1"
+
+[dependencies]
+aztec = { git="https://github.com/AztecProtocol/aztec-packages/", tag="aztec-packages-v0.10.1", directory="yarn-project/aztec-nr/aztec" }
+value_note = { git="https://github.com/AztecProtocol/aztec-packages/", tag="aztec-packages-v0.10.1", directory="yarn-project/aztec-nr/value-note" }
+authwit = { git="https://github.com/AztecProtocol/aztec-packages/", tag="aztec-packages-v0.10.1", directory="yarn-project/aztec-nr/authwit"}
