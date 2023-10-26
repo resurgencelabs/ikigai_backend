@@ -76,6 +76,7 @@ contract Subscription {
         token_contract: AztecAddress,
         beneficiary: Field,
         amount: Field,
+        nonce: Field
     ) {
         let mut tr = 0 as Field;
         if (amount as u32 >= 100){
@@ -100,7 +101,7 @@ contract Subscription {
         let from = FromTransferStruct{address: owner};
         let to = ToTransferStruct{address: beneficiary};
         
-        let res = TokenPrivateContextInterface::at(token_contract.address).transfer(&mut context, from, to, amount, 0);
+        let res = TokenPrivateContextInterface::at(token_contract.address).transfer(&mut context, from, to, amount, nonce);
         assert (res[0] == 1);
 
         let mut owner_note = AssetNote::new(owner, proj, tr, exp, cd);
