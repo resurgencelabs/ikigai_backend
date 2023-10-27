@@ -20,7 +20,7 @@
       "generate:token:interface": "aztec-cli generate-noir-interface ./src/contracts/token --artifacts target --outdir ../subscription/src"
     },
     "dependencies": {
-      "@aztec/aztec.js": "^0.11.1",
+      "@aztec/aztec.js": "^0.12.0",
       "@types/node": "^20.8.8",
       "typescript": "^5.2.2"
     }

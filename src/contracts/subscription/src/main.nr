@@ -41,6 +41,7 @@ contract Subscription {
     struct Storage {
         // the attributes of the strictly private NFT
         nft_data: Map<Set<AssetNote, ASSET_NOTE_LEN>>,
+        token_contract: PublicState<Field, FIELD_SERIALIZED_LEN>,
         
         
     }
@@ -54,17 +55,25 @@ contract Subscription {
                     |context, slot| {
                         Set::new(context, slot, AssetNoteMethods)
                     },
-                ),     
+                ),  
+                token_contract: PublicState::new(context, 1, FieldSerializationMethods),   
             }
         }
     }
 
     // Constructs the contract with no parameters required
     #[aztec(private)]
-    fn constructor( )  {}
+    fn constructor( token: Field)  {
+        let selector = compute_selector("_init(Field)");
+        context.call_public_function(context.this_address(), selector, [token]);
+    }
 
     
-   
+   #[aztec(public)]
+    internal fn _init(token_: Field) {
+        storage.token_contract.write(token_);
+        
+    }
     
     // The minting function that takes the project id, tier id, expiry epoch and a secret code (in case you want to 
     // transfer said NFT to a friend)
@@ -78,6 +87,9 @@ contract Subscription {
         amount: Field,
         nonce: Field,
     ) {
+        let selector = compute_selector("_check_valid_token(Field)");
+        context.call_public_function(context.this_address(), selector, [token_contract.address]);
+        
         let mut tr = 0 as Field;
         if (amount as u32 >= 100){
             tr = 1;
@@ -111,6 +123,13 @@ contract Subscription {
     }
 
     // No transfer method because this is an instance of a Soul Bound Private NFT
+
+    #[aztec(public)]
+    internal fn _check_valid_token(token_: Field) {
+        let valid_token = storage.token_contract.read();
+        assert (valid_token == token_);
+        
+    }
 
 
     // Reads all notes under the given caller id Field, and asserts if the number of such notes is
