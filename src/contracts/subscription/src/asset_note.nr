@@ -46,6 +46,11 @@ impl AssetNote {
         [self.owner, self.project, self.tier, self.expiry, self.code, self.randomness]
     }
 
+    pub fn compute_note_hash(self) -> Field {
+        // TODO(#1205) Should use a non-zero generator index.
+        pedersen_hash(self.serialize(), 0)
+    }
+
     pub fn compute_nullifier(self) -> Field {
         let siloed_note_hash = compute_siloed_note_hash(AssetNoteMethods, self);
         let secret = get_secret_key(self.owner);
@@ -91,8 +96,7 @@ fn serialize(note: AssetNote) -> [Field; ASSET_NOTE_LEN]{
 }
 
 fn compute_note_hash(note: AssetNote) -> Field {
-    // TODO(#1205) Should use a non-zero generator index.
-    dep::std::hash::pedersen(note.serialize())[0]
+    note.compute_note_hash()
 }
 
 fn compute_nullifier(note: AssetNote) -> Field {
