@@ -7,6 +7,7 @@ use dep::aztec::{
     oracle::{
         get_secret_key::get_secret_key,
         get_public_key::get_public_key,
+        rand::rand,
     },
     context::PrivateContext,
     state_vars::set::Set,
@@ -14,7 +15,7 @@ use dep::aztec::{
     hash::pedersen_hash,
 };
 
-global ASSET_NOTE_LEN: Field = 5;
+global ASSET_NOTE_LEN: Field = 6;
 
 // Stores an asset
 struct AssetNote {
@@ -23,23 +24,26 @@ struct AssetNote {
     tier: Field,
     expiry: Field,
     code: Field,
+    randomness: Field,
     header: NoteHeader,
 }
 
 impl AssetNote {
     pub fn new(owner: Field, project: Field, tier: Field, expiry: Field, code: Field) -> Self {
+        let randomness = rand();
         AssetNote {
             owner,
             project,
             tier,
             expiry,
             code,
+            randomness,
             header: NoteHeader::empty(),
         }
     }
 
     pub fn serialize(self) -> [Field; ASSET_NOTE_LEN]{
-        [self.owner, self.project, self.tier, self.expiry, self.code]
+        [self.owner, self.project, self.tier, self.expiry, self.code, self.randomness]
     }
 
     pub fn compute_nullifier(self) -> Field {
@@ -77,6 +81,7 @@ fn deserialize(preimage: [Field; ASSET_NOTE_LEN]) -> AssetNote {
         tier: preimage[2],
         expiry: preimage[3],
         code: preimage[4],
+        randomness: preimage[5],
         header: NoteHeader::empty(),
     }
 }

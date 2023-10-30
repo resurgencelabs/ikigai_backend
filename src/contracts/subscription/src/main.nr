@@ -169,6 +169,25 @@ contract Subscription {
         
     }
 
+    unconstrained fn fetch_first_valid_note(proj: Field, tier: Field, now: Field, owner: Field) -> [Field;ASSET_NOTE_LEN]{
+        let options = NoteGetterOptions::new();
+        let owner_notes = storage.nft_data.at(owner);
+        let maybe_notes = owner_notes.get_notes(options);
+        let mut not_found = true;
+        let mut res = [0,0,0,0,0,0];
+        for i in 0..maybe_notes.len() {
+            if maybe_notes[i].is_some() {
+                let note = maybe_notes[i].unwrap_unchecked();
+                if ((not_found) & (note.project as u32 == proj as u32) & (note.expiry as u32 > now as u32) & (note.tier as u32 >= tier as u32)) {
+                    not_found = false;
+                    res = note.serialize();
+
+                }
+            }
+        }
+        res
+    }
+
    
    
 
