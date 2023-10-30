@@ -123,6 +123,10 @@ async function main() {
     const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token.address, beneficiary, amount, nonce).send().wait();
 
     logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
+
+    const valid_note = await subsContractAlice.methods.fetch_first_valid_note(proj, 1, 2, alice.toField()).view();
+    logger('First note guaranteeing access to Alice for this project is...');
+    logger(valid_note.toString());
 }
 
 main();
