@@ -13,6 +13,7 @@ contract Subscription {
         note::{
             note_header::NoteHeader,
             note_getter_options::NoteGetterOptions,
+            note_viewer_options::NoteViewerOptions,
             utils as note_utils,
         },
         state_vars::{map::Map, set::Set, public_state::PublicState, singleton::Singleton},
@@ -170,9 +171,9 @@ contract Subscription {
     }
 
     unconstrained fn fetch_first_valid_note(proj: Field, tier: Field, now: Field, owner: Field) -> [Field;ASSET_NOTE_LEN]{
-        let options = NoteGetterOptions::new();
+        let options = NoteViewerOptions::new();
         let owner_notes = storage.nft_data.at(owner);
-        let maybe_notes = owner_notes.get_notes(options);
+        let maybe_notes = owner_notes.view_notes(options);
         let mut not_found = true;
         let mut res = [0,0,0,0,0,0];
         for i in 0..maybe_notes.len() {
