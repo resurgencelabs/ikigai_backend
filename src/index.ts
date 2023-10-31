@@ -4,21 +4,20 @@ import {
     NotePreimage,
     PXE,
     Wallet,
+    computeAuthWitMessageHash,
     computeMessageSecretHash,
     createDebugLogger,
     createPXEClient,
-    //createAztecNodeRpcClient,
     getSandboxAccountsWallets,
-    computeAuthWitMessageHash,
     waitForSandbox
 } from '@aztec/aztec.js';
 
+import { createAztecNodeRpcClient } from '@aztec/types';
 import { format } from 'util';
 import { SubscriptionContract } from './contracts/subscription/types/Subscription.js';
 import { TokenContract } from './contracts/token/types/Token.js';
 
-const { PXE_URL = 'http://localhost:8080' } = process.env;
-//const { AZTEC_NODE_URL } = 'https://localhost:8079';
+const { PXE_URL = 'http://localhost:8080', AZTEC_NODE_URL = 'http://localhost:8079' } = process.env;
 
 const logger = createDebugLogger('subscription:');
 
@@ -67,6 +66,11 @@ async function main() {
     // We create PXE client connected to the sandbox URL
     const pxe = createPXEClient(PXE_URL);
 
+    // TODO: remove aztecNode and @aztec/types dependency once release containing the PR linked bellows is available
+    // and then simply call pxe.getBlock(...)
+    // https://github.com/AztecProtocol/aztec-packages/pull/3139
+    const aztecNode = createAztecNodeRpcClient(AZTEC_NODE_URL);
+
     logger(`Waiting for PXE to be ready on ${PXE_URL}...`)
     await waitForSandbox(pxe);
 
@@ -107,8 +111,6 @@ async function main() {
     const aliceSecretHash = await computeMessageSecretHash(aliceSecret);
     const alice_tokens = 10000n;
 
-    
-
     const proj = 1;
     const exp = 20;
     const cd = 123;
@@ -127,17 +129,17 @@ async function main() {
     logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
 
     const valid_note = await subsContractAlice.methods.fetch_first_valid_note(proj, 1, 2, alice.toField()).view();
-    //logger('First note guaranteeing access to Alice for this project is...');
-    //logger(valid_note.toString());
-    
-    const block_receipt = receipt.blockNumber;
-    logger('Block for tx receipt...'+block_receipt);
-    
-    //const aztec_node = createAztecNodeRpcClient(AZTEC_NODE_URL);
+    logger('First note guaranteeing access to Alice for this project is...');
+    logger(valid_note.toString());
+
+    const block = await aztecNode.getBlock(receipt.blockNumber!);
+    const root = block?.endNoteHashTreeSnapshot?.root;
+    logger(`Root of the note hash tree for block ${receipt.blockNumber!} is ${root}`);
+
 
     //logger(`Waiting for AZTEC Node to be ready on ${AZTEC_NODE_URL}...`)
-    
-    
+
+
 }
 
 main();
