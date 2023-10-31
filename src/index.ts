@@ -1,18 +1,19 @@
 import {
     AztecAddress,
+    ExtendedNote,
     Fr,
-    NotePreimage,
+    Note,
     PXE,
     Wallet,
     computeAuthWitMessageHash,
     computeMessageSecretHash,
+    createAztecNodeClient,
     createDebugLogger,
     createPXEClient,
     getSandboxAccountsWallets,
     waitForSandbox
 } from '@aztec/aztec.js';
 
-import { createAztecNodeRpcClient } from '@aztec/types';
 import { format } from 'util';
 import { SubscriptionContract } from './contracts/subscription/types/Subscription.js';
 import { TokenContract } from './contracts/token/types/Token.js';
@@ -41,8 +42,9 @@ const mintTokens = async (contract: TokenContract, recipient: AztecAddress, bala
     const receipt = await contract.methods.mint_private(balance, secretHash).send().wait();
 
     const storageSlot = new Fr(5);
-    const preimage = new NotePreimage([new Fr(balance), secretHash]);
-    await pxe.addNote(recipient, contract.address, storageSlot, preimage, receipt.txHash);
+    const note = new Note([new Fr(balance), secretHash]);
+    const extendedNote = new ExtendedNote(note, recipient, contract.address, storageSlot, receipt.txHash);
+    await pxe.addNote(extendedNote);
 };
 
 const mintTokensAndRedeem = async (contract: TokenContract, recipient: AztecAddress, balance: bigint, secret: Fr, pxe: PXE) => {
@@ -52,8 +54,9 @@ const mintTokensAndRedeem = async (contract: TokenContract, recipient: AztecAddr
     const receipt = await contract.methods.mint_private(balance, secretHash).send().wait();
 
     const storageSlot = new Fr(5);
-    const preimage = new NotePreimage([new Fr(balance), secretHash]);
-    await pxe.addNote(recipient, contract.address, storageSlot, preimage, receipt.txHash);
+    const note = new Note([new Fr(balance), secretHash]);
+    const extendedNote = new ExtendedNote(note, recipient, contract.address, storageSlot, receipt.txHash);
+    await pxe.addNote(extendedNote);
 
     logger('Redeeming tokens for Alice..');
     await contract.methods.redeem_shield(recipient, balance, secret).send().wait();
@@ -65,11 +68,7 @@ async function main() {
     ////////////// CREATE THE CLIENT INTERFACE AND CONTACT THE SANDBOX //////////////
     // We create PXE client connected to the sandbox URL
     const pxe = createPXEClient(PXE_URL);
-
-    // TODO: remove aztecNode and @aztec/types dependency once release containing the PR linked bellows is available
-    // and then simply call pxe.getBlock(...)
-    // https://github.com/AztecProtocol/aztec-packages/pull/3139
-    const aztecNode = createAztecNodeRpcClient(AZTEC_NODE_URL);
+    const aztecNode = createAztecNodeClient(AZTEC_NODE_URL);
 
     logger(`Waiting for PXE to be ready on ${PXE_URL}...`)
     await waitForSandbox(pxe);
@@ -132,7 +131,7 @@ async function main() {
     logger('First note guaranteeing access to Alice for this project is...');
     logger(valid_note.toString());
 
-    const block = await aztecNode.getBlock(receipt.blockNumber!);
+    const block = await pxe.getBlock(receipt.blockNumber!);
     const root = block?.endNoteHashTreeSnapshot?.root;
     logger(`Root of the note hash tree for block ${receipt.blockNumber!} is ${root}`);
 
