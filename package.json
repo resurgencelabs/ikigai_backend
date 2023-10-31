@@ -16,7 +16,7 @@
       "start:sandbox": "SANDBOX_VERSION=latest /bin/bash -c \"$(curl -fsSL 'https://sandbox.aztec.network')\" ",
       "start:sandbox:npm": "npx @aztec/aztec-sandbox",
       "start": " yarn build && DEBUG='subscription*' node ./dest/index.js",
-      "compile:contracts": "aztec-cli compile ./src/contracts/token --typescript types && aztec-cli compile ./src/contracts/subscription --typescript types && rm src/contracts/token/target/debug_token_contract-Token.json",
+      "compile:contracts": "aztec-cli compile ./src/contracts/token --typescript types && aztec-cli compile ./src/contracts/subscription --typescript types",
       "generate:token:interface": "aztec-cli generate-noir-interface ./src/contracts/token --artifacts target --outdir ../subscription/src"
     },
     "dependencies": {
