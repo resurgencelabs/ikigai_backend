@@ -13,7 +13,7 @@ import {
     getSandboxAccountsWallets,
     waitForSandbox
 } from '@aztec/aztec.js';
-
+import { MerkleTreeId } from '@aztec/types';
 import { format } from 'util';
 import { SubscriptionContract } from './contracts/subscription/types/Subscription.js';
 import { TokenContract } from './contracts/token/types/Token.js';
@@ -135,8 +135,21 @@ async function main() {
     const root = block?.endNoteHashTreeSnapshot?.root;
     logger(`Root of the note hash tree for block ${receipt.blockNumber!} is ${root}`);
 
-
-    //logger(`Waiting for AZTEC Node to be ready on ${AZTEC_NODE_URL}...`)
+    var note_hash = 0;
+    if (valid_note instanceof Array) {
+        note_hash = valid_note[6];
+        const pre_buff = new Fr(note_hash); 
+        logger('The value of the Note Hash is: '+note_hash.toString());
+        logger('The value of the Note Hash is: '+pre_buff);
+        const leaf_index = await aztecNode.findLeafIndex(MerkleTreeId.NOTE_HASH_TREE, pre_buff.toBuffer());
+        logger('The value of the Leaf Index is: '+leaf_index);
+        //const sibling_path = aztecNode.getNoteHashSiblingPath(leaf_index!);
+    }
+    else {
+        logger('No such NFT is owned by Alice as to give her access..');
+    }
+    
+    
 
 
 }
