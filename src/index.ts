@@ -7,6 +7,7 @@ import {
     computeMessageSecretHash,
     createDebugLogger,
     createPXEClient,
+    //createAztecNodeRpcClient,
     getSandboxAccountsWallets,
     computeAuthWitMessageHash,
     waitForSandbox
@@ -17,6 +18,7 @@ import { SubscriptionContract } from './contracts/subscription/types/Subscriptio
 import { TokenContract } from './contracts/token/types/Token.js';
 
 const { PXE_URL = 'http://localhost:8080' } = process.env;
+//const { AZTEC_NODE_URL } = 'https://localhost:8079';
 
 const logger = createDebugLogger('subscription:');
 
@@ -65,7 +67,7 @@ async function main() {
     // We create PXE client connected to the sandbox URL
     const pxe = createPXEClient(PXE_URL);
 
-    logger(`Waiting PXE to be ready on ${PXE_URL}...`)
+    logger(`Waiting for PXE to be ready on ${PXE_URL}...`)
     await waitForSandbox(pxe);
 
     const nodeInfo = await pxe.getNodeInfo();
@@ -125,8 +127,17 @@ async function main() {
     logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
 
     const valid_note = await subsContractAlice.methods.fetch_first_valid_note(proj, 1, 2, alice.toField()).view();
-    logger('First note guaranteeing access to Alice for this project is...');
-    logger(valid_note.toString());
+    //logger('First note guaranteeing access to Alice for this project is...');
+    //logger(valid_note.toString());
+    
+    const block_receipt = receipt.blockNumber;
+    logger('Block for tx receipt...'+block_receipt);
+    
+    //const aztec_node = createAztecNodeRpcClient(AZTEC_NODE_URL);
+
+    //logger(`Waiting for AZTEC Node to be ready on ${AZTEC_NODE_URL}...`)
+    
+    
 }
 
 main();
