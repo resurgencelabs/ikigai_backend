@@ -79,14 +79,14 @@ impl AssetNote {
     }
 }
 
-fn deserialize(preimage: [Field; ASSET_NOTE_LEN]) -> AssetNote {
+fn deserialize(serialized: [Field; ASSET_NOTE_LEN]) -> AssetNote {
     AssetNote {
-        owner: preimage[0],
-        project: preimage[1],
-        tier: preimage[2],
-        expiry: preimage[3],
-        code: preimage[4],
-        randomness: preimage[5],
+        owner: serialized[0],
+        project: serialized[1],
+        tier: serialized[2],
+        expiry: serialized[3],
+        code: serialized[4],
+        randomness: serialized[5],
         header: NoteHeader::empty(),
     }
 }

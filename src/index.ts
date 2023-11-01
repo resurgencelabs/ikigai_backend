@@ -127,31 +127,41 @@ async function main() {
 
     logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
 
-    const valid_note = await subsContractAlice.methods.fetch_first_valid_note(proj, 1, 2, alice.toField()).view();
-    logger('First note guaranteeing access to Alice for this project is...');
-    logger(valid_note.toString());
+    // const valid_note = await subsContractAlice.methods.fetch_first_valid_note(proj, 1, 2, alice.toField()).view();
+    // logger('First note guaranteeing access to Alice for this project is...');
+    // logger(valid_note.toString());
 
     const block = await pxe.getBlock(receipt.blockNumber!);
     const root = block?.endNoteHashTreeSnapshot?.root;
-    logger(`Root of the note hash tree for block ${receipt.blockNumber!} is ${root}`);
 
-    var note_hash = 0;
-    if (valid_note instanceof Array) {
-        note_hash = valid_note[6];
-        const pre_buff = new Fr(note_hash); 
-        logger('The value of the Note Hash is: '+note_hash.toString());
-        logger('The value of the Note Hash is: '+pre_buff);
-        const leaf_index = await aztecNode.findLeafIndex(MerkleTreeId.NOTE_HASH_TREE, pre_buff.toBuffer());
-        logger('The value of the Leaf Index is: '+leaf_index);
-        //const sibling_path = aztecNode.getNoteHashSiblingPath(leaf_index!);
+    const extendedNote = (await pxe.getNotes({ contractAddress: contract.address }))[0];
+    const storageSlot = extendedNote.storageSlot;
+    const [noteNonce] = await pxe.getNoteNonces(extendedNote);
+
+    const resp = await subsContractAlice.methods.compute_note_hash_and_nullifier(subsContractAlice.address, noteNonce, storageSlot, extendedNote.note.items).view();
+    const uniqueSiloedNoteHash = new Fr(resp[2]);
+
+    const leafIndex = await aztecNode.findLeafIndex(MerkleTreeId.NOTE_HASH_TREE, uniqueSiloedNoteHash.toBuffer());
+    const siblingPath = await aztecNode.getNoteHashSiblingPath(leafIndex!);
+
+    const [owner, project, tier, expiry, code, randomness] = extendedNote.note.items;
+
+    const publicInput = {
+        root,
+        contractAddress: contract.address,
+        owner,
+        project,
+        tier,
+        expiry,
+        code,
+    };
+    const privateInput = {
+        siblingPath,
+        randomness,
     }
-    else {
-        logger('No such NFT is owned by Alice as to give her access..');
-    }
-    
-    
 
-
+    console.log('Public Input: ', publicInput);
+    console.log('Private Input: ', privateInput);
 }
 
 main();

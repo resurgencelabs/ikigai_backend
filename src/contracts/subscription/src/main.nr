@@ -170,26 +170,18 @@ contract Subscription {
         
     }
 
-    unconstrained fn fetch_first_valid_note(proj: Field, tier: Field, now: Field, owner: Field) -> [Field;ASSET_NOTE_LEN+1]{
+    unconstrained fn fetch_first_valid_note(proj: Field, tier: Field, now: Field, owner: Field) -> [Field;ASSET_NOTE_LEN]{
         let options = NoteViewerOptions::new();
         let owner_notes = storage.nft_data.at(owner);
         let maybe_notes = owner_notes.view_notes(options);
         let mut not_found = true;
-        let mut res = [0,0,0,0,0,0,0];
+        let mut res = [0,0,0,0,0,0];
         for i in 0..maybe_notes.len() {
             if maybe_notes[i].is_some() {
                 let note = maybe_notes[i].unwrap_unchecked();
                 if ((not_found) & (note.project as u32 == proj as u32) & (note.expiry as u32 > now as u32) & (note.tier as u32 >= tier as u32)) {
                     not_found = false;
-                    //res = note.serialize();
-                    res[0] = note.owner;
-                    res[1] = note.project;
-                    res[2] = note.tier;
-                    res[3] = note.expiry;
-                    res[4] = note.code;
-                    res[5] = note.randomness;
-                    res[6] = note.compute_note_hash();
-
+                    res = note.serialize();
                 }
             }
         }
@@ -202,8 +194,8 @@ contract Subscription {
     // Computes note hash and nullifier.
     // Note 1: Needs to be defined by every contract producing logs.
     // Note 2: Having it in all the contracts gives us the ability to compute the note hash and nullifier differently for different kind of notes.
-    unconstrained fn compute_note_hash_and_nullifier(contract_address: Field, nonce: Field, storage_slot: Field, preimage: [Field; ASSET_NOTE_LEN]) -> [Field; 4] {
+    unconstrained fn compute_note_hash_and_nullifier(contract_address: Field, nonce: Field, storage_slot: Field, serialized_note: [Field; ASSET_NOTE_LEN]) -> [Field; 4] {
         let note_header = NoteHeader::new(contract_address, nonce, storage_slot);
-        note_utils::compute_note_hash_and_nullifier(AssetNoteMethods, note_header, preimage)
+        note_utils::compute_note_hash_and_nullifier(AssetNoteMethods, note_header, serialized_note)
     }
 }
