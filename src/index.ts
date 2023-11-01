@@ -18,6 +18,10 @@ import { format } from 'util';
 import { SubscriptionContract } from './contracts/subscription/types/Subscription.js';
 import { TokenContract } from './contracts/token/types/Token.js';
 
+import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
+import { Noir } from '@noir-lang/noir_js';
+import subscription_external from './circuits/target/subscription_external.json';
+
 const { PXE_URL = 'http://localhost:8080', AZTEC_NODE_URL = 'http://localhost:8079' } = process.env;
 
 const logger = createDebugLogger('subscription:');
@@ -145,7 +149,7 @@ async function main() {
     const siblingPath = await aztecNode.getNoteHashSiblingPath(leafIndex!);
 
     const [owner, project, tier, expiry, code, randomness] = extendedNote.note.items;
-
+ 
     const publicInput = {
         root,
         contractAddress: contract.address,
@@ -162,6 +166,18 @@ async function main() {
 
     console.log('Public Input: ', publicInput);
     console.log('Private Input: ', privateInput);
+
+    const ben = new Fr(beneficiary);
+    
+    const backend = new BarretenbergBackend(subscription_external);
+    const noir = new Noir(subscription_external, backend);
+    const input = { x: ben.toString(), y: code.toString() };
+    logger('Generating proof... ⌛');
+    const proof = await noir.generateFinalProof(input);
+    logger('Generating proof... ✅');
+    logger('Verifying proof... ⌛');
+    const verification = await noir.verifyFinalProof(proof);
+    if (verification) logger('Verifying proof... ✅');
 }
 
 main();
