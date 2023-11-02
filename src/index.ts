@@ -162,23 +162,25 @@ async function main() {
     const privateInput = {
         siblingPath,
         randomness,
-    }
+    };
 
     console.log('Public Input: ', publicInput);
     console.log('Private Input: ', privateInput);
 
+    const x_input = (new Fr(beneficiary)).toString();
+    const y_input = ben.toString();
     
-    
-    //const backend = new BarretenbergBackend(subscription_external);
-    //const noir = new Noir(subscription_external, backend);
-    const input = { x: new Fr(beneficiary), y: ben};
+   
+    const input = { x: x_input, y: y_input};
     logger('Generating proof... ⌛');
-    //const proof = await noir.generateFinalProof(input);
+  
     const verification = await noir_proof(input);
     logger('Generating proof... ✅');
     logger('Verifying proof... ⌛');
-    //const verification = await noir.verifyFinalProof(proof);
-    if (verification) logger('Verifying proof... ✅');
+   
+    if (verification) {
+        logger('Verifying proof... ✅');
+    }
 }
 
 main();
