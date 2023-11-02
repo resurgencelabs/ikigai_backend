@@ -10,3 +10,4 @@ log
 .tsbuildinfo
 src/contracts/token/crs
 src/circuits/target
+crs
