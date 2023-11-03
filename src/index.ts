@@ -115,7 +115,6 @@ async function main() {
 
     const proj = 1;
     const exp = 20;
-    const cd = 123;
     const beneficiary = bob;
     const amount = 500;
 
@@ -126,7 +125,7 @@ async function main() {
     const witness = await accounts[0].createAuthWitness(messageHash);
     await accounts[0].addAuthWitness(witness);
 
-    const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, cd, token.address, beneficiary, amount, nonce).send().wait();
+    const receipt = await subsContractAlice.methods.subscribe_and_mint(proj, exp, token.address, beneficiary, amount, nonce).send().wait();
 
     logger(`Private Subscription NFT successfully minted and redeemed by Alice`);
 
@@ -147,7 +146,7 @@ async function main() {
     const leafIndex = await aztecNode.findLeafIndex(MerkleTreeId.NOTE_HASH_TREE, uniqueSiloedNoteHash.toBuffer());
     const siblingPath = await aztecNode.getNoteHashSiblingPath(leafIndex!);
 
-    const [owner, project, tier, expiry, code, ben, randomness] = extendedNote.note.items;
+    const [owner, project, tier, expiry, ben, randomness] = extendedNote.note.items;
     
  
     const publicInput = {
@@ -157,7 +156,7 @@ async function main() {
         project,
         tier,
         expiry,
-        code,
+        ben,
     };
     const privateInput = {
         siblingPath,
@@ -169,9 +168,18 @@ async function main() {
 
     const x_input = (new Fr(beneficiary)).toString();
     const y_input = ben.toString();
+    const owner_input = owner.toString();
+    const proj_input = project.toString();
+    const tier_input = tier.toString();
+    const exp_input = expiry.toString();
+    const ben_input = ben.toString();
+    const rand_input = randomness.toString();
+    const ctct_input = contract.address.toString();
+    const nonce_input = noteNonce.toString();
+    const unique_hash_expected = uniqueSiloedNoteHash.toString()
     
    
-    const input = { x: x_input, y: y_input};
+    const input = { x: x_input, y: y_input, owner_: owner_input, proj_: proj_input,tier_: tier_input,exp_: exp_input, ben_: ben_input, rand_: rand_input, ctrt_: ctct_input, nonce_: nonce_input, uhash_: unique_hash_expected};
     logger('Generating proof... ⌛');
   
     const verification = await noir_proof(input);

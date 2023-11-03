@@ -82,7 +82,6 @@ contract Subscription {
     fn subscribe_and_mint( 
         proj: Field,
         exp: Field,
-        cd: Field,
         token_contract: AztecAddress,
         beneficiary: Field,
         amount: Field,
@@ -117,7 +116,7 @@ contract Subscription {
         let res = TokenPrivateContextInterface::at(token_contract.address).transfer(&mut context, from, to, amount, nonce);
         assert (res[0] == 1);
 
-        let mut owner_note = AssetNote::new(owner, proj, tr, exp, cd, beneficiary);
+        let mut owner_note = AssetNote::new(owner, proj, tr, exp, beneficiary);
 
         let owner_set = storage.nft_data.at(owner);
         owner_set.insert(&mut owner_note, true);
@@ -175,7 +174,7 @@ contract Subscription {
         let owner_notes = storage.nft_data.at(owner);
         let maybe_notes = owner_notes.view_notes(options);
         let mut not_found = true;
-        let mut res = [0,0,0,0,0,0,0];
+        let mut res = [0,0,0,0,0,0];
         for i in 0..maybe_notes.len() {
             if maybe_notes[i].is_some() {
                 let note = maybe_notes[i].unwrap_unchecked();

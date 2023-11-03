@@ -15,7 +15,7 @@ use dep::aztec::{
     hash::pedersen_hash,
 };
 
-global ASSET_NOTE_LEN: Field = 7;
+global ASSET_NOTE_LEN: Field = 6;
 
 // Stores an asset
 struct AssetNote {
@@ -23,21 +23,19 @@ struct AssetNote {
     project: Field,
     tier: Field,
     expiry: Field,
-    code: Field,
     beneficiary: Field,
     randomness: Field,
     header: NoteHeader,
 }
 
 impl AssetNote {
-    pub fn new(owner: Field, project: Field, tier: Field, expiry: Field, code: Field, beneficiary: Field) -> Self {
+    pub fn new(owner: Field, project: Field, tier: Field, expiry: Field, beneficiary: Field) -> Self {
         let randomness = rand();
         AssetNote {
             owner,
             project,
             tier,
             expiry,
-            code,
             beneficiary,
             randomness,
             header: NoteHeader::empty(),
@@ -45,7 +43,7 @@ impl AssetNote {
     }
 
     pub fn serialize(self) -> [Field; ASSET_NOTE_LEN]{
-        [self.owner, self.project, self.tier, self.expiry, self.code, self.beneficiary, self.randomness]
+        [self.owner, self.project, self.tier, self.expiry, self.beneficiary, self.randomness]
     }
 
     pub fn compute_note_hash(self) -> Field {
@@ -87,9 +85,8 @@ fn deserialize(serialized: [Field; ASSET_NOTE_LEN]) -> AssetNote {
         project: serialized[1],
         tier: serialized[2],
         expiry: serialized[3],
-        code: serialized[4],
-        beneficiary: serialized[5],
-        randomness: serialized[6],
+        beneficiary: serialized[4],
+        randomness: serialized[5],
         header: NoteHeader::empty(),
     }
 }
