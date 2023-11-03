@@ -23,10 +23,15 @@ fn main(x: Field,
     ) {
    
     //let ser_note = [owner_, proj_, tier_, exp_, code_, ben_, rand_];
-    //let note_hash = std::hash::pedersen_hash(ser_note);
-    //let inner_note_hash = std::hash::pedersen_hash(storage_slot, note_hash);
-    //let siloed_note_hash = std::hash::pedersen_hash(ctrt_, inner_note_hash);
-    //let unique_siloed_note_hash = std::hash::pedersen_hash(nonce_, siloed_note_hash);
+    //let deserialize = note_interface.deserialize;
+    //let set_header = note_interface.set_header;
+    //let mut note = deserialize(arr_copy_slice(ser_note, [0; 6], 0));
+    //set_header(&mut note, note_header);
+    //let compute_note_hash = note_interface.compute_note_hash;
+    //let note_hash = compute_note_hash(note);
+    //let inner_note_hash = compute_inner_hash(note_header.storage_slot, note_hash);
+    //let siloed_note_hash = compute_siloed_hash(ctrt_, inner_note_hash);
+    //let unique_siloed_note_hash = compute_unique_hash(nonce_, siloed_note_hash);
     assert(x == y);
     //assert(uhash_ == unique_siloed_note_hash);
 }
