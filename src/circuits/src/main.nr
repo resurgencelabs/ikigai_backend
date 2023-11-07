@@ -3,11 +3,12 @@ use dep::aztec::{
     note::{
         note_header::NoteHeader,
         note_interface::NoteInterface,
-        utils::compute_siloed_note_hash,
+        utils::{compute_siloed_note_hash, arr_copy_slice},
         note_hash::{compute_inner_hash, compute_siloed_hash, compute_unique_hash},
     },
 };
 use dep::std;
+
 
 fn main(x: Field, 
     y: pub Field, 
